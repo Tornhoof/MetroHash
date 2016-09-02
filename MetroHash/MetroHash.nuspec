@@ -4,8 +4,9 @@
     <id>MetroHash</id>
     <version>0.1.0.0</version>
     <title>MetroHash</title>
-    <authors>MetroHash Contributors</authors>
-    <owners>MetroHash Contributors</owners>
+    <authors>MetroHash for .NET Contributors</authors>
+    <owners>MetroHash for .NET Contributors</owners>
+	<copyright>J. Andrew Rogers, MetroHash for .NET Contributors</copyright>
     <licenseUrl>https://github.com/Tornhoof/MetroHash/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/Tornhoof/MetroHash</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
