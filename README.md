@@ -4,6 +4,10 @@ Compare https://github.com/jandrewrogers/MetroHash
 
 ## Implementation
 This implements the non-incremental version of the Metro Hash 128 algorithm.
+Note: An incremental implementation deriving from HashAlgorithm is several times slower, due to memcpy overhead for incremental and the overall overhead from .NET's HashAlgorithm system.
+
+## Nuget
+https://www.nuget.org/packages/MetroHash
 
 ## Performance
 ```ini
