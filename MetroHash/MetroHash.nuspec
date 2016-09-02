@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>MetroHash</id>
+    <version>0.1.0.0</version>
+    <title>MetroHash</title>
+    <authors>MetroHash Contributors</authors>
+    <owners>MetroHash Contributors</owners>
+    <licenseUrl>https://github.com/Tornhoof/MetroHash/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/Tornhoof/MetroHash</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+	<description>MetroHash for .NET</description>
+    <tags/>
+    <dependencies>
+      <group targetFramework=".NETStandard1.0">
+        <dependency id="System.Collections" version="[4.0.11, )"/>
+      </group>
+    </dependencies>
+  </metadata>
+ <files>
+    <file src="bin\Release\MetroHash.dll" target="lib\netstandard1.0"/>
+	<file src="bin\Release\MetroHash.xml" target="lib\netstandard1.0"/>
+</files>  
+</package>

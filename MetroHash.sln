@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetroHash", "MetroHash\MetroHash.csproj", "{92FB53B1-ADF8-4213-8FB3-434ECCF65EF3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetroHash.Tests", "MetroHash.Tests\MetroHash.Tests.csproj", "{99235F5A-B4B1-4F7E-A2A1-A8FD6DBDAECB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetroHash.Benchmark", "MetroHash.Benchmark\MetroHash.Benchmark.csproj", "{BBE028AC-C98A-493D-98CC-4EC5B13FD60C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{92FB53B1-ADF8-4213-8FB3-434ECCF65EF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92FB53B1-ADF8-4213-8FB3-434ECCF65EF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92FB53B1-ADF8-4213-8FB3-434ECCF65EF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92FB53B1-ADF8-4213-8FB3-434ECCF65EF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99235F5A-B4B1-4F7E-A2A1-A8FD6DBDAECB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99235F5A-B4B1-4F7E-A2A1-A8FD6DBDAECB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99235F5A-B4B1-4F7E-A2A1-A8FD6DBDAECB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99235F5A-B4B1-4F7E-A2A1-A8FD6DBDAECB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BBE028AC-C98A-493D-98CC-4EC5B13FD60C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBE028AC-C98A-493D-98CC-4EC5B13FD60C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBE028AC-C98A-493D-98CC-4EC5B13FD60C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBE028AC-C98A-493D-98CC-4EC5B13FD60C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
