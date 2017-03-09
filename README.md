@@ -21,9 +21,9 @@ Frequency=3507226 ticks, Resolution=285.1256 ns, Timer=TSC
 
 
 ```
- |                     Method |       Mean |    StdDev |  Gen 0 | Allocated |
- |--------------------------- |----------- |---------- |------- |---------- |
- | MetroHash128NonIncremental | 54.7950 ns | 0.0998 ns | 0.0079 |      40 B |
+| Method                     |       Mean |    StdDev |  Gen 0 | Allocated |
+|--------------------------- |----------- |---------- |------- |---------- |
+| MetroHash128NonIncremental | 54.7950 ns | 0.0998 ns | 0.0079 |      40 B |
 
 
 ## Copyright
