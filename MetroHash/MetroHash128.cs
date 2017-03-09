@@ -36,85 +36,88 @@ namespace MetroHash
             {
                 throw new ArgumentOutOfRangeException(nameof(count));
             }
-            var state = new ulong[4];
+            var result = new byte[16];
             var end = offset + count;
-            state[0] = (seed - K0)*K3;
-            state[1] = (seed + K1)*K2;
+            ulong[] state = Unsafe.As<byte[], ulong[]>(ref result); // this is safe as both are blittable
+            ref var firstState = ref state[0];
+            ref var secondState = ref state[1];
+            ulong thirdState = 0;
+            ulong fourthState = 0;
+            firstState = (seed - K0) * K3;
+            secondState = (seed + K1) * K2;
             if (count >= 32)
             {
-                state[2] = (seed + K0)*K2;
-                state[3] = (seed - K1)*K3;
+                thirdState = (seed + K0) * K2;
+                fourthState = (seed - K1) * K3;
             }
             while (offset <= end - 32)
             {
-                state[0] += ToUlong(input, offset)*K0;
+                firstState += ToUlong(input, offset) * K0;
                 offset += 8;
-                state[0] = RotateRight(state[0], 29) + state[2];
-                state[1] += ToUlong(input, offset)*K1;
+                firstState = RotateRight(firstState, 29) + thirdState;
+                secondState += ToUlong(input, offset) * K1;
                 offset += 8;
-                state[1] = RotateRight(state[1], 29) + state[3];
-                state[2] += ToUlong(input, offset)*K2;
+                secondState = RotateRight(secondState, 29) + fourthState;
+                thirdState += ToUlong(input, offset) * K2;
                 offset += 8;
-                state[2] = RotateRight(state[2], 29) + state[0];
-                state[3] += ToUlong(input, offset)*K3;
+                thirdState = RotateRight(thirdState, 29) + firstState;
+                fourthState += ToUlong(input, offset) * K3;
                 offset += 8;
-                state[3] = RotateRight(state[3], 29) + state[1];
+                fourthState = RotateRight(fourthState, 29) + secondState;
             }
-            state[2] ^= RotateRight((state[0] + state[3])*K0 + state[1], 21)*K1;
-            state[3] ^= RotateRight((state[1] + state[2])*K1 + state[0], 21)*K0;
-            state[0] ^= RotateRight((state[0] + state[2])*K0 + state[3], 21)*K1;
-            state[1] ^= RotateRight((state[1] + state[3])*K1 + state[2], 21)*K0;
+            thirdState ^= RotateRight((firstState + fourthState) * K0 + secondState, 21) * K1;
+            fourthState ^= RotateRight((secondState + thirdState) * K1 + firstState, 21) * K0;
+            firstState ^= RotateRight((firstState + thirdState) * K0 + fourthState, 21) * K1;
+            secondState ^= RotateRight((secondState + fourthState) * K1 + thirdState, 21) * K0;
 
             if (end - offset >= 16)
             {
-                state[0] += ToUlong(input, offset)*K2;
+                firstState += ToUlong(input, offset) * K2;
                 offset += 8;
-                state[0] = RotateRight(state[0], 33)*K3;
-                state[1] += ToUlong(input, offset)*K2;
+                firstState = RotateRight(firstState, 33) * K3;
+                secondState += ToUlong(input, offset) * K2;
                 offset += 8;
-                state[1] = RotateRight(state[1], 33)*K3;
-                state[0] ^= RotateRight(state[0]*K2 + state[1], 45)*K1;
-                state[1] ^= RotateRight(state[1]*K3 + state[0], 45)*K0;
+                secondState = RotateRight(secondState, 33) * K3;
+                firstState ^= RotateRight(firstState * K2 + secondState, 45) * K1;
+                secondState ^= RotateRight(secondState * K3 + firstState, 45) * K0;
             }
 
             if (end - offset >= 8)
             {
-                state[0] += ToUlong(input, offset)*K2;
+                firstState += ToUlong(input, offset) * K2;
                 offset += 8;
-                state[0] = RotateRight(state[0], 33)*K3;
-                state[0] ^= RotateRight(state[0]*K2 + state[1], 27)*K1;
+                firstState = RotateRight(firstState, 33) * K3;
+                firstState ^= RotateRight(firstState * K2 + secondState, 27) * K1;
             }
 
             if (end - offset >= 4)
             {
-                state[1] += ToUint(input, offset)*K2;
+                secondState += ToUint(input, offset) * K2;
                 offset += 4;
-                state[1] = RotateRight(state[1], 33)*K3;
-                state[1] ^= RotateRight(state[1]*K3 + state[0], 46)*K0;
+                secondState = RotateRight(secondState, 33) * K3;
+                secondState ^= RotateRight(secondState * K3 + firstState, 46) * K0;
             }
 
             if (end - offset >= 2)
             {
-                state[0] += ToUshort(input, offset)*K2;
+                firstState += ToUshort(input, offset) * K2;
                 offset += 2;
-                state[0] = RotateRight(state[0], 33)*K3;
-                state[0] ^= RotateRight(state[0]*K2 + state[1], 22)*K1;
+                firstState = RotateRight(firstState, 33) * K3;
+                firstState ^= RotateRight(firstState * K2 + secondState, 22) * K1;
             }
 
             if (end - offset >= 1)
             {
-                state[1] += ToByte(input, offset)*K2;
-                state[1] = RotateRight(state[1], 33)*K3;
-                state[1] ^= RotateRight(state[1]*K3 + state[0], 58)*K0;
+                secondState += ToByte(input, offset) * K2;
+                secondState = RotateRight(secondState, 33) * K3;
+                secondState ^= RotateRight(secondState * K3 + firstState, 58) * K0;
             }
 
-            state[0] += RotateRight(state[0]*K0 + state[1], 13);
-            state[1] += RotateRight(state[1]*K1 + state[0], 37);
-            state[0] += RotateRight(state[0]*K2 + state[1], 13);
-            state[1] += RotateRight(state[1]*K3 + state[0], 37);
+            firstState += RotateRight(firstState * K0 + secondState, 13);
+            secondState += RotateRight(secondState * K1 + firstState, 37);
+            firstState += RotateRight(firstState * K2 + secondState, 13);
+            secondState += RotateRight(secondState * K3 + firstState, 37);
 
-            var result = new byte[16];
-            Buffer.BlockCopy(state, 0, result, 0, 16);
             return result;
         }
 
@@ -133,7 +136,7 @@ namespace MetroHash
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static ushort ToUshort(byte[] data, int start)
         {
-            return (ushort) (data[start] | (data[start + 1] << 8));
+            return Unsafe.As<byte, ushort>(ref data[start]);
         }
 
         /// <summary>
@@ -142,7 +145,7 @@ namespace MetroHash
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static uint ToUint(byte[] data, int start)
         {
-            return (uint) (data[start] | (data[start + 1] << 8) | (data[start + 2] << 16) | (data[start + 3] << 24));
+            return Unsafe.As<byte, uint>(ref data[start]);
         }
 
         /// <summary>
@@ -151,10 +154,7 @@ namespace MetroHash
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static ulong ToUlong(byte[] data, int start)
         {
-            var i1 = (uint) (data[start] | (data[start + 1] << 8) | (data[start + 2] << 16) | (data[start + 3] << 24));
-            var i2 =
-                (ulong) (data[start + 4] | (data[start + 5] << 8) | (data[start + 6] << 16) | (data[start + 7] << 24));
-            return i1 | (i2 << 32);
+            return Unsafe.As<byte, ulong>(ref data[start]);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

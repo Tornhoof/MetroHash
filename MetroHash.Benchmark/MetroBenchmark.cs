@@ -1,19 +1,10 @@
 ﻿using System.Text;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnostics.Windows;
 
 namespace MetroHash.Benchmark
 {
-    public class MyConfig : ManualConfig
-    {
-        public MyConfig()
-        {
-            Add(new MemoryDiagnoser());
-        }
-    }
-
-    [Config(typeof(MyConfig))]
+    [MemoryDiagnoser]
     public class MetroBenchmark
     {
         private static readonly byte[] _data =
