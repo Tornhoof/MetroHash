@@ -15,5 +15,13 @@ namespace MetroHash.Benchmark
         {
             return MetroHash128.Hash(0, _data, 0, _data.Length);
         }
+
+        [Benchmark]
+        public byte[] MetroHash128Incremental()
+        {
+            var metroHash = new MetroHash128(0);
+            metroHash.Update(_data, 0, _data.Length);
+            return metroHash.Finalize();
+        }
     }
 }
