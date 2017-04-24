@@ -15,7 +15,7 @@ Incremental:
 ```csharp
     var metroHash = new MetroHash128(0);
     metroHash.Update(_data, 0, _data.Length);
-    var hash = metroHash.Finalize();
+    var hash = metroHash.FinalizeHash();
 ```
 
 ## Nuget
