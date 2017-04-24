@@ -11,8 +11,8 @@ Non-Incremental:
 ```csharp
     var hash = MetroHash128.Hash(0, _data, 0, _data.Length);
 ```
-```csharp
 Incremental: 
+```csharp
     var metroHash = new MetroHash128(0);
     metroHash.Update(_data, 0, _data.Length);
     var hash = metroHash.Finalize();
