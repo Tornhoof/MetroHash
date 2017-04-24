@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 namespace MetroHash.Tests
 {
     /// <summary>
-    /// Metro Hash 128
+    ///     Metro Hash 128
     /// </summary>
     public static class OldMetroHash128
     {
@@ -14,8 +14,8 @@ namespace MetroHash.Tests
         private const ulong K3 = 0x2F5870A5;
 
         /// <summary>
-        /// MetroHash 128 hash method
-        /// Not cryptographically secure
+        ///     MetroHash 128 hash method
+        ///     Not cryptographically secure
         /// </summary>
         /// <param name="seed">Seed to initialize data</param>
         /// <param name="input">Data you want to hash</param>
@@ -25,20 +25,14 @@ namespace MetroHash.Tests
         public static byte[] Hash(ulong seed, byte[] input, int offset, int count)
         {
             if (input == null)
-            {
                 throw new ArgumentNullException(nameof(input));
-            }
             if (offset < 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(offset));
-            }
             if (input.Length < offset + count)
-            {
                 throw new ArgumentOutOfRangeException(nameof(count));
-            }
             var result = new byte[16];
             var end = offset + count;
-            ulong[] state = Unsafe.As<byte[], ulong[]>(ref result); // this is safe as both are blittable
+            var state = Unsafe.As<byte[], ulong[]>(ref result); // this is safe as both are blittable
             ref var firstState = ref state[0];
             ref var secondState = ref state[1];
             ulong thirdState = 0;

@@ -4,38 +4,29 @@
     <TargetFramework>netstandard1.0</TargetFramework>
     <AssemblyName>MetroHash</AssemblyName>
     <PackageId>MetroHash</PackageId>
-	<EnableDefaultItems>false</EnableDefaultItems>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>0.5.0.0</Version>
+    <Version>0.6.0.0</Version>
     <Authors>MetroHash for .NET Contributors</Authors>
     <PackageLicenseUrl>https://github.com/Tornhoof/MetroHash/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/Tornhoof/MetroHash</PackageProjectUrl>
-    <PackageReleaseNotes>- Support for the incremental version of MetroHash 128</PackageReleaseNotes>
+    <PackageReleaseNotes>- Blocked use on BigEndian machines due to unsafe code</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/Tornhoof/MetroHash</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>MetroHash</PackageTags>
+    <Description>MetroHash is a non-cryptopgraphic hashing algorithm developed by J. Andrew Rogers
+https://github.com/jandrewrogers/MetroHash</Description>
+    <Copyright>Copyright © MetroHash for .NET Contributors 2017</Copyright>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>bin\Release\netstandard1.0\MetroHash.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="**\*.cs" /> 
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="obj\**" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="System.Collections" Version="4.3.0" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>

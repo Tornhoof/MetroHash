@@ -1,10 +1,11 @@
 ﻿using System.Text;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Diagnostics.Windows;
+using BenchmarkDotNet.Diagnostics.Windows.Configs;
 
 namespace MetroHash.Benchmark
 {
     [MemoryDiagnoser]
+    [InliningDiagnoser]
     public class MetroBenchmark
     {
         private static readonly byte[] _data =
@@ -21,7 +22,7 @@ namespace MetroHash.Benchmark
         {
             var metroHash = new MetroHash128(0);
             metroHash.Update(_data, 0, _data.Length);
-            return metroHash.Finalize();
+            return metroHash.FinalizeHash();
         }
     }
 }

@@ -4,20 +4,36 @@ using System.Runtime.CompilerServices;
 namespace MetroHash
 {
     /// <summary>
-    /// Metro Hash 128
+    ///     Metro Hash 128
     /// </summary>
-    public class MetroHash128
+    public sealed class MetroHash128
     {
 
-        private byte[] _result;
-        private byte[] _buffer;
-        private ulong[] _firstTwoStates;
-        private ulong _thirdState;
-        private ulong _fourthState;
+        private static bool _initialized = Initialize();
+
+        private static bool Initialize()
+        {
+            if (!BitConverter.IsLittleEndian)
+            {
+                throw new InvalidOperationException("Sorry, doesn't work on BigEndian at the moment.");
+            }
+            return true;
+        }
+
+        private const ulong K0 = 0xC83A91E1;
+        private const ulong K1 = 0x8648DBDB;
+        private const ulong K2 = 0x7BDEC03B;
+        private const ulong K3 = 0x2F5870A5;
+        private readonly byte[] _buffer;
+        private readonly ulong[] _firstTwoStates;
+
+        private readonly byte[] _result;
         private int _bytes;
+        private ulong _fourthState;
+        private ulong _thirdState;
 
         /// <summary>
-        /// Constructor for incremental version, call Update and Finalize for full Hash
+        ///     Constructor for incremental version, call Update and FinalizeHash for full Hash
         /// </summary>
         /// <param name="seed">Seed</param>
         public MetroHash128(ulong seed)
@@ -35,6 +51,7 @@ namespace MetroHash
             _fourthState = (seed - K1) * K3;
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         private static void ValidateInput(byte[] input, int offset, int count)
         {
             if (input == null)
@@ -50,8 +67,9 @@ namespace MetroHash
                 throw new ArgumentOutOfRangeException(nameof(count));
             }
         }
+
         /// <summary>
-        /// Add data to hash
+        ///     Add data to hash
         /// </summary>
         /// <param name="input">data</param>
         /// <param name="offset">offset</param>
@@ -63,10 +81,10 @@ namespace MetroHash
             ref var firstState = ref _firstTwoStates[0];
             ref var secondState = ref _firstTwoStates[1];
             var end = offset + count;
-            var bMod = _bytes % 32;
+            var bMod = _bytes & 31;
             if (bMod != 0)
             {
-                int fill = 32 - bMod;
+                var fill = 32 - bMod;
                 if (fill > count)
                 {
                     fill = count;
@@ -76,7 +94,7 @@ namespace MetroHash
                 offset += fill;
                 _bytes += fill;
 
-                if (_bytes % 32 != 0)
+                if ((_bytes & 31) != 0)
                 {
                     return;
                 }
@@ -99,7 +117,8 @@ namespace MetroHash
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void BulkLoop(ref ulong firstState, ref ulong secondState, ref ulong thirdState, ref ulong fourthState, byte[] buffer, ref int offset, int count)
+        private static void BulkLoop(ref ulong firstState, ref ulong secondState, ref ulong thirdState,
+            ref ulong fourthState, byte[] buffer, ref int offset, int count)
         {
             while (offset <= count - 32)
             {
@@ -118,7 +137,8 @@ namespace MetroHash
             }
         }
 
-        private static void FinalizeHash(ref ulong firstState, ref ulong secondState, ref ulong thirdState, ref ulong fourthState, byte[] buffer, ref int offset, int count)
+        private static void FinalizeHash(ref ulong firstState, ref ulong secondState, ref ulong thirdState,
+            ref ulong fourthState, byte[] buffer, ref int offset, int count)
         {
             // finalize bulk loop, if used
             if (count >= 32)
@@ -129,7 +149,7 @@ namespace MetroHash
                 secondState ^= RotateRight((secondState + fourthState) * K1 + thirdState, 21) * K0;
             }
 
-            var end = offset + count % 32;
+            var end = offset + (count & 31);
 
             if (end - offset >= 16)
             {
@@ -181,20 +201,21 @@ namespace MetroHash
         }
 
         /// <summary>
-        /// Finalizes the hash and returns the hash
+        ///     Finalizes the hash and returns the hash
         /// </summary>
         /// <returns>Hash</returns>
-        public byte[] Finalize()
+        public byte[] FinalizeHash()
         {
-            int offset = 0;
-            FinalizeHash(ref _firstTwoStates[0], ref _firstTwoStates[1], ref _thirdState, ref _fourthState, _buffer, ref offset, _bytes);
+            var offset = 0;
+            FinalizeHash(ref _firstTwoStates[0], ref _firstTwoStates[1], ref _thirdState, ref _fourthState, _buffer,
+                ref offset, _bytes);
             _bytes = 0;
             return _result;
         }
 
         /// <summary>
-        /// MetroHash 128 hash method
-        /// Not cryptographically secure
+        ///     MetroHash 128 hash method
+        ///     Not cryptographically secure
         /// </summary>
         /// <param name="seed">Seed to initialize data</param>
         /// <param name="input">Data you want to hash</param>
@@ -206,7 +227,7 @@ namespace MetroHash
             ValidateInput(input, offset, count);
             var result = new byte[16];
             var end = offset + count;
-            ulong[] state = Unsafe.As<byte[], ulong[]>(ref result);
+            var state = Unsafe.As<byte[], ulong[]>(ref result);
             ref var firstState = ref state[0];
             ref var secondState = ref state[1];
             ulong thirdState = 0;
@@ -222,11 +243,6 @@ namespace MetroHash
             FinalizeHash(ref firstState, ref secondState, ref thirdState, ref fourthState, input, ref offset, count);
             return result;
         }
-
-        private const ulong K0 = 0xC83A91E1;
-        private const ulong K1 = 0x8648DBDB;
-        private const ulong K2 = 0x7BDEC03B;
-        private const ulong K3 = 0x2F5870A5;
 
 
         /// <summary>
