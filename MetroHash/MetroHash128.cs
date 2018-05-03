@@ -86,15 +86,12 @@ namespace MetroHash
                 {
                     return;
                 }
-                firstState += ToUlong(_buffer, 0) * K0;
-                firstState = RotateRight(firstState, 29) + _thirdState;
-                secondState += ToUlong(_buffer, 8) * K1;
-                secondState = RotateRight(secondState, 29) + _fourthState;
-                _thirdState += ToUlong(_buffer, 16) * K2;
-                _thirdState = RotateRight(_thirdState, 29) + firstState;
-                _fourthState += ToUlong(_buffer, 24) * K3;
-                _fourthState = RotateRight(_fourthState, 29) + secondState;
+
+                var tempOffset = 0;
+                BulkLoop(ref firstState, ref secondState, ref _thirdState, ref _fourthState, _buffer, ref tempOffset,
+                    32);
             }
+
             _bytes += end - offset;
             BulkLoop(ref firstState, ref secondState, ref _thirdState, ref _fourthState, input, ref offset, end);
 
