@@ -1,27 +1,52 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Diagnostics.Windows.Configs;
 
 namespace MetroHash.Benchmark
 {
     [MemoryDiagnoser]
-    [InliningDiagnoser]
     public class MetroBenchmark
     {
-        private static readonly byte[] _data =
+        private static readonly byte[] Data =
             Encoding.ASCII.GetBytes("012345678901234567890123456789012345678901234567890123456789012");
 
+        private static readonly byte[] Buffer = new byte[16];
         [Benchmark]
         public byte[] MetroHash128NonIncremental()
         {
-            return MetroHash128.Hash(0, _data, 0, _data.Length);
+            return MetroHash128.Hash(0, Data, 0, Data.Length);
         }
 
         [Benchmark]
         public byte[] MetroHash128Incremental()
         {
             var metroHash = new MetroHash128(0);
-            metroHash.Update(_data, 0, _data.Length);
+            metroHash.Update(Data, 0, Data.Length);
+            return metroHash.FinalizeHash();
+        }
+
+
+        [Benchmark]
+        public byte[] MetroHash128NonIncrementalSpan()
+        {
+            MetroHash128.Hash(0, Data, Buffer);
+            return Buffer;
+        }
+
+        [Benchmark]
+        public byte[] MetroHash128IncrementalSpan()
+        {
+            var metroHash = new MetroHash128(0);
+            metroHash.Update(Data);
+            metroHash.FinalizeHash(Buffer);
+            return Buffer;
+        }
+
+        [Benchmark]
+        public byte[] MetroHash128IncrementalSpanDirectReturn()
+        {
+            var metroHash = new MetroHash128(0);
+            metroHash.Update(Data);
             return metroHash.FinalizeHash();
         }
     }

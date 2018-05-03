@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace MetroHash
 {
@@ -8,18 +9,6 @@ namespace MetroHash
     /// </summary>
     public sealed class MetroHash128
     {
-
-        private static bool _initialized = Initialize();
-
-        private static bool Initialize()
-        {
-            if (!BitConverter.IsLittleEndian)
-            {
-                throw new InvalidOperationException("Sorry, doesn't work on BigEndian at the moment.");
-            }
-            return true;
-        }
-
         private const ulong K0 = 0xC83A91E1;
         private const ulong K1 = 0x8648DBDB;
         private const ulong K2 = 0x7BDEC03B;
@@ -58,10 +47,12 @@ namespace MetroHash
             {
                 throw new ArgumentNullException(nameof(input));
             }
+
             if (offset < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(offset));
             }
+
             if (input.Length < offset + count)
             {
                 throw new ArgumentOutOfRangeException(nameof(count));
@@ -98,17 +89,15 @@ namespace MetroHash
                 {
                     return;
                 }
-                firstState += ToUlong(_buffer, 0) * K0;
-                firstState = RotateRight(firstState, 29) + _thirdState;
-                secondState += ToUlong(_buffer, 8) * K1;
-                secondState = RotateRight(secondState, 29) + _fourthState;
-                _thirdState += ToUlong(_buffer, 16) * K2;
-                _thirdState = RotateRight(_thirdState, 29) + firstState;
-                _fourthState += ToUlong(_buffer, 24) * K3;
-                _fourthState = RotateRight(_fourthState, 29) + secondState;
+
+                var tempOffset = 0;
+                BulkLoop(ref firstState, ref secondState, ref _thirdState, ref _fourthState, ref _buffer[0],
+                    ref tempOffset,
+                    32);
             }
+
             _bytes += end - offset;
-            BulkLoop(ref firstState, ref secondState, ref _thirdState, ref _fourthState, input, ref offset, end);
+            BulkLoop(ref firstState, ref secondState, ref _thirdState, ref _fourthState, ref input[0], ref offset, end);
 
             if (offset < end)
             {
@@ -116,47 +105,92 @@ namespace MetroHash
             }
         }
 
+        /// <summary>
+        ///     Add data to hash
+        /// </summary>
+        /// <param name="input">data</param>        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Update(ReadOnlySpan<byte> input)
+        {
+            ref var firstState = ref _firstTwoStates[0];
+            ref var secondState = ref _firstTwoStates[1];
+            var count = input.Length;
+            var offset = 0;
+            var bMod = _bytes & 31;
+            if (bMod != 0)
+            {
+                var fill = 32 - bMod;
+                if (fill > count)
+                {
+                    fill = count;
+                }
+
+                input.Slice(0, fill).CopyTo(_buffer.AsSpan().Slice(bMod));
+                _bytes += fill;
+                offset += fill;
+
+                if ((_bytes & 31) != 0)
+                {
+                    return;
+                }
+
+                var tempOffset = 0;
+                BulkLoop(ref firstState, ref secondState, ref _thirdState, ref _fourthState, ref _buffer[0],
+                    ref tempOffset, 32);
+            }
+
+            _bytes += count - offset;
+            ref var start = ref MemoryMarshal.GetReference(input);
+            BulkLoop(ref firstState, ref secondState, ref _thirdState, ref _fourthState, ref start, ref offset,
+                input.Length);
+            if (offset < count)
+            {
+                input.Slice(offset).CopyTo(_buffer.AsSpan());
+            }
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void BulkLoop(ref ulong firstState, ref ulong secondState, ref ulong thirdState,
-            ref ulong fourthState, byte[] buffer, ref int offset, int count)
+            ref ulong fourthState, ref byte b, ref int offset, int count)
         {
             while (offset <= count - 32)
             {
-                firstState += ToUlong(buffer, offset) * K0;
+                firstState += Cast<ulong>(ref b, offset) * K0;
                 offset += 8;
                 firstState = RotateRight(firstState, 29) + thirdState;
-                secondState += ToUlong(buffer, offset) * K1;
+                secondState += Cast<ulong>(ref b, offset) * K1;
                 offset += 8;
                 secondState = RotateRight(secondState, 29) + fourthState;
-                thirdState += ToUlong(buffer, offset) * K2;
+                thirdState += Cast<ulong>(ref b, offset) * K2;
                 offset += 8;
                 thirdState = RotateRight(thirdState, 29) + firstState;
-                fourthState += ToUlong(buffer, offset) * K3;
+                fourthState += Cast<ulong>(ref b, offset) * K3;
                 offset += 8;
                 fourthState = RotateRight(fourthState, 29) + secondState;
             }
         }
 
-        private static void FinalizeHash(ref ulong firstState, ref ulong secondState, ref ulong thirdState,
-            ref ulong fourthState, byte[] buffer, ref int offset, int count)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void FinalizeBulkLoop(ref ulong firstState, ref ulong secondState, ref ulong thirdState,
+            ref ulong fourthState)
         {
-            // finalize bulk loop, if used
-            if (count >= 32)
-            {
-                thirdState ^= RotateRight((firstState + fourthState) * K0 + secondState, 21) * K1;
-                fourthState ^= RotateRight((secondState + thirdState) * K1 + firstState, 21) * K0;
-                firstState ^= RotateRight((firstState + thirdState) * K0 + fourthState, 21) * K1;
-                secondState ^= RotateRight((secondState + fourthState) * K1 + thirdState, 21) * K0;
-            }
+            thirdState ^= RotateRight((firstState + fourthState) * K0 + secondState, 21) * K1;
+            fourthState ^= RotateRight((secondState + thirdState) * K1 + firstState, 21) * K0;
+            firstState ^= RotateRight((firstState + thirdState) * K0 + fourthState, 21) * K1;
+            secondState ^= RotateRight((secondState + fourthState) * K1 + thirdState, 21) * K0;
+        }
 
+        private static void FinalizeHash(ref ulong firstState, ref ulong secondState, ref byte b, ref int offset,
+            int count)
+        {
             var end = offset + (count & 31);
 
             if (end - offset >= 16)
             {
-                firstState += ToUlong(buffer, offset) * K2;
+                firstState += Cast<ulong>(ref b, offset) * K2;
                 offset += 8;
                 firstState = RotateRight(firstState, 33) * K3;
-                secondState += ToUlong(buffer, offset) * K2;
+                secondState += Cast<ulong>(ref b, offset) * K2;
                 offset += 8;
                 secondState = RotateRight(secondState, 33) * K3;
                 firstState ^= RotateRight(firstState * K2 + secondState, 45) * K1;
@@ -165,7 +199,7 @@ namespace MetroHash
 
             if (end - offset >= 8)
             {
-                firstState += ToUlong(buffer, offset) * K2;
+                firstState += Cast<ulong>(ref b, offset) * K2;
                 offset += 8;
                 firstState = RotateRight(firstState, 33) * K3;
                 firstState ^= RotateRight(firstState * K2 + secondState, 27) * K1;
@@ -173,7 +207,7 @@ namespace MetroHash
 
             if (end - offset >= 4)
             {
-                secondState += ToUint(buffer, offset) * K2;
+                secondState += Cast<uint>(ref b, offset) * K2;
                 offset += 4;
                 secondState = RotateRight(secondState, 33) * K3;
                 secondState ^= RotateRight(secondState * K3 + firstState, 46) * K0;
@@ -181,7 +215,7 @@ namespace MetroHash
 
             if (end - offset >= 2)
             {
-                firstState += ToUshort(buffer, offset) * K2;
+                firstState += Cast<ushort>(ref b, offset) * K2;
                 offset += 2;
                 firstState = RotateRight(firstState, 33) * K3;
                 firstState ^= RotateRight(firstState * K2 + secondState, 22) * K1;
@@ -189,7 +223,7 @@ namespace MetroHash
 
             if (end - offset >= 1)
             {
-                secondState += ToByte(buffer, offset) * K2;
+                secondState += Unsafe.Add(ref b, offset) * K2;
                 secondState = RotateRight(secondState, 33) * K3;
                 secondState ^= RotateRight(secondState * K3 + firstState, 58) * K0;
             }
@@ -200,6 +234,12 @@ namespace MetroHash
             secondState += RotateRight(secondState * K3 + firstState, 37);
         }
 
+        [MethodImpl((MethodImplOptions.AggressiveInlining))]
+        private static T Cast<T>(ref byte b, int offset) where T : unmanaged
+        {
+            return Unsafe.As<byte, T>(ref Unsafe.Add(ref b, offset));
+        }
+
         /// <summary>
         ///     Finalizes the hash and returns the hash
         /// </summary>
@@ -207,10 +247,33 @@ namespace MetroHash
         public byte[] FinalizeHash()
         {
             var offset = 0;
-            FinalizeHash(ref _firstTwoStates[0], ref _firstTwoStates[1], ref _thirdState, ref _fourthState, _buffer,
+            if (_bytes >= 32)
+            {
+                FinalizeBulkLoop(ref _firstTwoStates[0], ref _firstTwoStates[1], ref _thirdState, ref _fourthState);
+            }
+
+            FinalizeHash(ref _firstTwoStates[0], ref _firstTwoStates[1], ref _buffer[0],
                 ref offset, _bytes);
             _bytes = 0;
             return _result;
+        }
+
+        /// <summary>
+        ///     Finalizes the hash and returns the hash
+        /// </summary>
+        /// <param name="output">Span to write to</param>
+        public void FinalizeHash(Span<byte> output)
+        {
+            var offset = 0;
+            if (_bytes >= 32)
+            {
+                FinalizeBulkLoop(ref _firstTwoStates[0], ref _firstTwoStates[1], ref _thirdState, ref _fourthState);
+            }
+
+            FinalizeHash(ref _firstTwoStates[0], ref _firstTwoStates[1], ref _buffer[0],
+                ref offset, _bytes);
+            _bytes = 0;
+            _result.CopyTo(output);
         }
 
         /// <summary>
@@ -221,7 +284,7 @@ namespace MetroHash
         /// <param name="input">Data you want to hash</param>
         /// <param name="offset">Start of the data you want to hash</param>
         /// <param name="count">Length of the data you want to hash</param>
-        /// <returns></returns>
+        /// <returns>Hash</returns>
         public static byte[] Hash(ulong seed, byte[] input, int offset, int count)
         {
             ValidateInput(input, offset, count);
@@ -230,55 +293,48 @@ namespace MetroHash
             var state = Unsafe.As<byte[], ulong[]>(ref result);
             ref var firstState = ref state[0];
             ref var secondState = ref state[1];
-            ulong thirdState = 0;
-            ulong fourthState = 0;
             firstState = (seed - K0) * K3;
             secondState = (seed + K1) * K2;
             if (count >= 32)
             {
-                thirdState = (seed + K0) * K2;
-                fourthState = (seed - K1) * K3;
+                var thirdState = (seed + K0) * K2;
+                var fourthState = (seed - K1) * K3;
+                BulkLoop(ref firstState, ref secondState, ref thirdState, ref fourthState, ref input[0], ref offset,
+                    end);
+                FinalizeBulkLoop(ref firstState, ref secondState, ref thirdState, ref fourthState);
             }
-            BulkLoop(ref firstState, ref secondState, ref thirdState, ref fourthState, input, ref offset, end);
-            FinalizeHash(ref firstState, ref secondState, ref thirdState, ref fourthState, input, ref offset, count);
+
+            FinalizeHash(ref firstState, ref secondState, ref input[0], ref offset, count);
             return result;
         }
 
-
         /// <summary>
-        ///     BitConverter methods are several times slower
+        ///     MetroHash 128 hash method
+        ///     Not cryptographically secure
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static byte ToByte(byte[] data, int start)
+        /// <param name="seed">Seed to initialize data</param>
+        /// <param name="input">Data you want to hash</param>
+        /// <param name="output">Span to write to</param>
+        public static void Hash(ulong seed, ReadOnlySpan<byte> input, Span<byte> output)
         {
-            return data[start];
-        }
+            var state = MemoryMarshal.Cast<byte, ulong>(output);
+            ref var firstState = ref state[0];
+            ref var secondState = ref state[1];
+            firstState = (seed - K0) * K3;
+            secondState = (seed + K1) * K2;
+            var offset = 0;
+            var count = input.Length;
+            ref var start = ref MemoryMarshal.GetReference(input);
+            if (input.Length >= 32)
+            {
+                var thirdState = (seed + K0) * K2;
+                var fourthState = (seed - K1) * K3;
+                BulkLoop(ref firstState, ref secondState, ref thirdState, ref fourthState, ref start, ref offset,
+                    input.Length);
+                FinalizeBulkLoop(ref firstState, ref secondState, ref thirdState, ref fourthState);
+            }
 
-        /// <summary>
-        ///     BitConverter methods are several times slower
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ushort ToUshort(byte[] data, int start)
-        {
-            return Unsafe.As<byte, ushort>(ref data[start]);
-        }
-
-        /// <summary>
-        ///     BitConverter methods are several times slower
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static uint ToUint(byte[] data, int start)
-        {
-            return Unsafe.As<byte, uint>(ref data[start]);
-        }
-
-        /// <summary>
-        ///     BitConverter methods are several times slower
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ulong ToUlong(byte[] data, int start)
-        {
-            return Unsafe.As<byte, ulong>(ref data[start]);
+            FinalizeHash(ref firstState, ref secondState, ref start, ref offset, count);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
