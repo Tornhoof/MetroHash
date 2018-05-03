@@ -16,7 +16,7 @@
     <Description>MetroHash is a non-cryptopgraphic hashing algorithm developed by J. Andrew Rogers
 https://github.com/jandrewrogers/MetroHash</Description>
     <Copyright>Copyright © MetroHash for .NET Contributors 2017</Copyright>
-	<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+	  <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
