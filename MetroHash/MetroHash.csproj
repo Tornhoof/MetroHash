@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.0</TargetFramework>
+    <TargetFramework>netstandard1.1</TargetFramework>
     <AssemblyName>MetroHash</AssemblyName>
     <PackageId>MetroHash</PackageId>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -17,6 +17,7 @@
 https://github.com/jandrewrogers/MetroHash</Description>
     <Copyright>Copyright © MetroHash for .NET Contributors 2017</Copyright>
 	  <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -24,11 +25,8 @@ https://github.com/jandrewrogers/MetroHash</Description>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.Collections" Version="4.3.0" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.0-preview2-26406-04" />
     <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
+    <PackageReference Include="System.Memory" Version="4.5.0-preview2-26406-04" Condition="'$(TargetFramework)' == 'netstandard1.1'" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
-
 </Project>
