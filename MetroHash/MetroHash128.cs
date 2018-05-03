@@ -107,16 +107,16 @@ namespace MetroHash
         {
             while (offset <= count - 32)
             {
-                firstState += ToUlong(buffer, offset) * K0;
+                firstState += Unsafe.As<byte,ulong>(ref buffer[offset]) * K0;
                 offset += 8;
                 firstState = RotateRight(firstState, 29) + thirdState;
-                secondState += ToUlong(buffer, offset) * K1;
+                secondState += Unsafe.As<byte, ulong>(ref buffer[offset]) * K1;
                 offset += 8;
                 secondState = RotateRight(secondState, 29) + fourthState;
-                thirdState += ToUlong(buffer, offset) * K2;
+                thirdState += Unsafe.As<byte, ulong>(ref buffer[offset]) * K2;
                 offset += 8;
                 thirdState = RotateRight(thirdState, 29) + firstState;
-                fourthState += ToUlong(buffer, offset) * K3;
+                fourthState += Unsafe.As<byte, ulong>(ref buffer[offset]) * K3;
                 offset += 8;
                 fourthState = RotateRight(fourthState, 29) + secondState;
             }
@@ -138,10 +138,10 @@ namespace MetroHash
 
             if (end - offset >= 16)
             {
-                firstState += ToUlong(buffer, offset) * K2;
+                firstState += Unsafe.As<byte, ulong>(ref buffer[offset]) * K2;
                 offset += 8;
                 firstState = RotateRight(firstState, 33) * K3;
-                secondState += ToUlong(buffer, offset) * K2;
+                secondState += Unsafe.As<byte, ulong>(ref buffer[offset]) * K2;
                 offset += 8;
                 secondState = RotateRight(secondState, 33) * K3;
                 firstState ^= RotateRight(firstState * K2 + secondState, 45) * K1;
@@ -150,7 +150,7 @@ namespace MetroHash
 
             if (end - offset >= 8)
             {
-                firstState += ToUlong(buffer, offset) * K2;
+                firstState += Unsafe.As<byte, ulong>(ref buffer[offset]) * K2;
                 offset += 8;
                 firstState = RotateRight(firstState, 33) * K3;
                 firstState ^= RotateRight(firstState * K2 + secondState, 27) * K1;
@@ -158,7 +158,7 @@ namespace MetroHash
 
             if (end - offset >= 4)
             {
-                secondState += ToUint(buffer, offset) * K2;
+                secondState += Unsafe.As<byte, uint>(ref buffer[offset]) * K2;
                 offset += 4;
                 secondState = RotateRight(secondState, 33) * K3;
                 secondState ^= RotateRight(secondState * K3 + firstState, 46) * K0;
@@ -166,7 +166,7 @@ namespace MetroHash
 
             if (end - offset >= 2)
             {
-                firstState += ToUshort(buffer, offset) * K2;
+                firstState += Unsafe.As<byte, ushort>(ref buffer[offset]) * K2;
                 offset += 2;
                 firstState = RotateRight(firstState, 33) * K3;
                 firstState ^= RotateRight(firstState * K2 + secondState, 22) * K1;
@@ -174,7 +174,7 @@ namespace MetroHash
 
             if (end - offset >= 1)
             {
-                secondState += ToByte(buffer, offset) * K2;
+                secondState += buffer[offset] * K2;
                 secondState = RotateRight(secondState, 33) * K3;
                 secondState ^= RotateRight(secondState * K3 + firstState, 58) * K0;
             }
@@ -230,43 +230,6 @@ namespace MetroHash
             }
             FinalizeHash(ref firstState, ref secondState, input, ref offset, count);
             return result;
-        }
-
-
-        /// <summary>
-        ///     BitConverter methods are several times slower
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static byte ToByte(byte[] data, int start)
-        {
-            return data[start];
-        }
-
-        /// <summary>
-        ///     BitConverter methods are several times slower
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ushort ToUshort(byte[] data, int start)
-        {
-            return Unsafe.As<byte, ushort>(ref data[start]);
-        }
-
-        /// <summary>
-        ///     BitConverter methods are several times slower
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static uint ToUint(byte[] data, int start)
-        {
-            return Unsafe.As<byte, uint>(ref data[start]);
-        }
-
-        /// <summary>
-        ///     BitConverter methods are several times slower
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ulong ToUlong(byte[] data, int start)
-        {
-            return Unsafe.As<byte, ulong>(ref data[start]);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
