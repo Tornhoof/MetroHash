@@ -41,5 +41,13 @@ namespace MetroHash.Benchmark
             metroHash.FinalizeHash(Buffer);
             return Buffer;
         }
+
+        [Benchmark]
+        public byte[] MetroHash128IncrementalSpanDirectReturn()
+        {
+            var metroHash = new MetroHash128(0);
+            metroHash.Update(Data);
+            return metroHash.FinalizeHash();
+        }
     }
 }
