@@ -10,7 +10,7 @@ Due to code-sharing between both versions the non-incremental is a bit slower th
 Non-Incremental: 
 ```csharp
     var hash = MetroHash128.Hash(0, _data, 0, _data.Length);
-	MetroHash128.Hash(0, inputSpan, outputSpan);
+    MetroHash128.Hash(0, inputSpan, outputSpan);
 ```
 Incremental: 
 ```csharp
@@ -18,11 +18,11 @@ Incremental:
     metroHash.Update(_data, 0, _data.Length);
     var hash = metroHash.FinalizeHash();
 	
-	var metroHash = new MetroHash128(0);
+    var metroHash = new MetroHash128(0);
     metroHash.Update(dataSpan);
     var hash = metroHash.FinalizeHash();
 	
-	var metroHash = new MetroHash128(0);
+    var metroHash = new MetroHash128(0);
     metroHash.Update(dataSpan);
     metroHash.FinalizeHash(outputSpan); // this version is a bit slower than the one above
 ```
