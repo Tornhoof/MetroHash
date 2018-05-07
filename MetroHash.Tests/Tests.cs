@@ -123,13 +123,14 @@ namespace MetroHash.Tests
 
             for (var i = 0; i < size; i++)
             {
-                var firstHash = MetroHash128.Hash(0, input, 0, input.Length);
+                Span<byte> firstHash = stackalloc byte[16];
+                MetroHash128.Hash(0, input.AsSpan(), firstHash);
                 var metroHash = new MetroHash128(0);
                 metroHash.Update(input.AsSpan());
                 var secondHash = metroHash.FinalizeHash();
-                Assert.Equal(firstHash, secondHash);
+                Assert.Equal(firstHash.ToArray(), secondHash);
                 var thirdHash = OldMetroHash128.Hash(0, input, 0, input.Length);
-                Assert.Equal(firstHash, thirdHash);
+                Assert.Equal(firstHash.ToArray(), thirdHash);
             }
         }
 

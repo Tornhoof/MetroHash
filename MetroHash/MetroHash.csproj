@@ -5,7 +5,7 @@
     <AssemblyName>MetroHash</AssemblyName>
     <PackageId>MetroHash</PackageId>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>0.7.0.0</Version>
+    <Version>0.8.0-rc1</Version>
     <Authors>MetroHash for .NET Contributors</Authors>
     <PackageLicenseUrl>https://github.com/Tornhoof/MetroHash/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/Tornhoof/MetroHash</PackageProjectUrl>
@@ -15,9 +15,12 @@
     <PackageTags>MetroHash</PackageTags>
     <Description>MetroHash is a non-cryptopgraphic hashing algorithm developed by J. Andrew Rogers
 https://github.com/jandrewrogers/MetroHash</Description>
-    <Copyright>Copyright © MetroHash for .NET Contributors 2017</Copyright>
+    <Copyright>Copyright © MetroHash for .NET Contributors</Copyright>
 	  <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <LangVersion>latest</LangVersion>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <SourceLinkCreate>true</SourceLinkCreate>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -25,8 +28,10 @@ https://github.com/jandrewrogers/MetroHash</Description>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.Collections" Version="4.3.0" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.0-preview2-26406-04" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.0-rc1" />
     <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
-    <PackageReference Include="System.Memory" Version="4.5.0-preview2-26406-04" Condition="'$(TargetFramework)' == 'netstandard1.1'" />
+    <PackageReference Include="System.Memory" Version="4.5.0-rc1" Condition="'$(TargetFramework)' == 'netstandard1.1'" />
+    <PackageReference Include="SourceLink.Create.CommandLine" Version="2.8.1" PrivateAssets="All" />
+    <DotNetCliToolReference Include="dotnet-sourcelink" Version="2.8.1" />
   </ItemGroup>
 </Project>

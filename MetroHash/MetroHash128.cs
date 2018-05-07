@@ -48,12 +48,12 @@ namespace MetroHash
                 throw new ArgumentNullException(nameof(input));
             }
 
-            if (offset < 0)
+            if ((uint) offset > (uint) input.Length)
             {
                 throw new ArgumentOutOfRangeException(nameof(offset));
             }
 
-            if (input.Length < offset + count)
+            if ((uint) count > (uint) (input.Length - offset))
             {
                 throw new ArgumentOutOfRangeException(nameof(count));
             }
@@ -112,6 +112,11 @@ namespace MetroHash
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Update(ReadOnlySpan<byte> input)
         {
+            if (input == null)
+            {
+                throw new ArgumentNullException(nameof(input));
+            }
+
             ref var firstState = ref _firstTwoStates[0];
             ref var secondState = ref _firstTwoStates[1];
             var count = input.Length;
@@ -235,7 +240,7 @@ namespace MetroHash
         }
 
         [MethodImpl((MethodImplOptions.AggressiveInlining))]
-        private static T Cast<T>(ref byte b, int offset) where T : unmanaged
+        private static T Cast<T>(ref byte b, int offset)
         {
             return Unsafe.As<byte, T>(ref Unsafe.Add(ref b, offset));
         }
@@ -264,6 +269,11 @@ namespace MetroHash
         /// <param name="output">Span to write to</param>
         public void FinalizeHash(Span<byte> output)
         {
+            if (output == null)
+            {
+                throw new ArgumentNullException(nameof(output));
+            }
+
             var offset = 0;
             if (_bytes >= 32)
             {
