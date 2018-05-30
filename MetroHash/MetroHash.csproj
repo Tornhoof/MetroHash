@@ -9,7 +9,7 @@
     <Authors>MetroHash for .NET Contributors</Authors>
     <PackageLicenseUrl>https://github.com/Tornhoof/MetroHash/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/Tornhoof/MetroHash</PackageProjectUrl>
-    <PackageReleaseNotes>Removed references to catch-all package</PackageReleaseNotes>
+    <PackageReleaseNotes>Support for Span</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/Tornhoof/MetroHash</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>MetroHash</PackageTags>
@@ -30,7 +30,7 @@ https://github.com/jandrewrogers/MetroHash</Description>
     <PackageReference Include="System.Collections" Version="4.3.0" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.0" />
     <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
-    <PackageReference Include="System.Memory" Version="4.5.0-rc1" Condition="'$(TargetFramework)' == 'netstandard1.1'" />
+    <PackageReference Include="System.Memory" Version="4.5.0" Condition="'$(TargetFramework)' == 'netstandard1.1'" />
     <PackageReference Include="SourceLink.Create.CommandLine" Version="2.8.1" PrivateAssets="All" />
     <DotNetCliToolReference Include="dotnet-sourcelink" Version="2.8.1" />
   </ItemGroup>
