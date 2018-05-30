@@ -5,7 +5,7 @@
     <AssemblyName>MetroHash</AssemblyName>
     <PackageId>MetroHash</PackageId>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>0.8.0-rc1</Version>
+    <Version>0.8.0</Version>
     <Authors>MetroHash for .NET Contributors</Authors>
     <PackageLicenseUrl>https://github.com/Tornhoof/MetroHash/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/Tornhoof/MetroHash</PackageProjectUrl>
@@ -24,11 +24,11 @@ https://github.com/jandrewrogers/MetroHash</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netstandard1.0\MetroHash.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\netstandard1.1\MetroHash.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.Collections" Version="4.3.0" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.0-rc1" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.0" />
     <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
     <PackageReference Include="System.Memory" Version="4.5.0-rc1" Condition="'$(TargetFramework)' == 'netstandard1.1'" />
     <PackageReference Include="SourceLink.Create.CommandLine" Version="2.8.1" PrivateAssets="All" />
