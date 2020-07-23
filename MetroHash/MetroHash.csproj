@@ -5,11 +5,11 @@
     <AssemblyName>MetroHash</AssemblyName>
     <PackageId>MetroHash</PackageId>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>0.8.0</Version>
+    <Version>0.9.0</Version>
     <Authors>MetroHash for .NET Contributors</Authors>
-    <PackageLicenseUrl>https://github.com/Tornhoof/MetroHash/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/Tornhoof/MetroHash</PackageProjectUrl>
-    <PackageReleaseNotes>Support for Span</PackageReleaseNotes>
+    <PackageReleaseNotes>Performance Optimization</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/Tornhoof/MetroHash</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>MetroHash</PackageTags>

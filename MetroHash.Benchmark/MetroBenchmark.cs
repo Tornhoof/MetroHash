@@ -10,11 +10,22 @@ namespace MetroHash.Benchmark
         private static readonly byte[] Data =
             Encoding.ASCII.GetBytes("012345678901234567890123456789012345678901234567890123456789012");
 
+        private static readonly byte[] LargeData =
+            Encoding.ASCII.GetBytes(
+                "012345678901234567890123456789012345678901234567890123456789012012345678901234567890123456789012345678901234567890123456789012012345678901234567890123456789012345678901234567890123456789012012345678901234567890123456789012345678901234567890123456789012");
+
         private static readonly byte[] Buffer = new byte[16];
+
         [Benchmark]
         public byte[] MetroHash128NonIncremental()
         {
             return MetroHash128.Hash(0, Data, 0, Data.Length);
+        }
+
+        [Benchmark]
+        public byte[] MetroHash128NonIncrementalLargeData()
+        {
+            return MetroHash128.Hash(0, LargeData, 0, LargeData.Length);
         }
 
         [Benchmark]
