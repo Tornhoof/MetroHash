@@ -156,29 +156,29 @@ namespace MetroHash
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void BulkLoop(ref ulong firstState, ref ulong secondState, ref ulong thirdState,
-            ref ulong fourthState, ref byte b, ref int finalOffset, int count)
+            ref ulong fourthState, ref byte b, ref int offset, int count)
         {
-            // Create a local copy so that it remains in the CPU cache.
-            int offset = finalOffset;
-		
-            while (offset <= count - 32)
+            // Create a local copy so that it remains in the CPU register.
+            int localOffset = offset; // workaround for dotnet/runtime#39349
+
+            while (localOffset <= count - 32)
             {
-                firstState += Cast<ulong>(ref b, offset) * K0;
-                offset += 8;
+                firstState += Cast<ulong>(ref b, localOffset) * K0;
+                localOffset += 8;
                 firstState = RotateRight(firstState, 29) + thirdState;
-                secondState += Cast<ulong>(ref b, offset) * K1;
-                offset += 8;
+                secondState += Cast<ulong>(ref b, localOffset) * K1;
+                localOffset += 8;
                 secondState = RotateRight(secondState, 29) + fourthState;
-                thirdState += Cast<ulong>(ref b, offset) * K2;
-                offset += 8;
+                thirdState += Cast<ulong>(ref b, localOffset) * K2;
+                localOffset += 8;
                 thirdState = RotateRight(thirdState, 29) + firstState;
-                fourthState += Cast<ulong>(ref b, offset) * K3;
-                offset += 8;
+                fourthState += Cast<ulong>(ref b, localOffset) * K3;
+                localOffset += 8;
                 fourthState = RotateRight(fourthState, 29) + secondState;
             }
-			
-            // Return the final result of the local copy.
-            finalOffset = offset;
+
+            // Return the final result of the local register.
+            offset = localOffset;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
