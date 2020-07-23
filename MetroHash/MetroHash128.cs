@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -156,8 +156,11 @@ namespace MetroHash
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void BulkLoop(ref ulong firstState, ref ulong secondState, ref ulong thirdState,
-            ref ulong fourthState, ref byte b, ref int offset, int count)
+            ref ulong fourthState, ref byte b, ref int finalOffset, int count)
         {
+            // Create a local copy so that it remains in the CPU cache.
+            int offset = finalOffset;
+		
             while (offset <= count - 32)
             {
                 firstState += Cast<ulong>(ref b, offset) * K0;
@@ -173,6 +176,9 @@ namespace MetroHash
                 offset += 8;
                 fourthState = RotateRight(fourthState, 29) + secondState;
             }
+			
+            // Return the final result of the local copy.
+            finalOffset = offset;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
